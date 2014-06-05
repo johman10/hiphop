@@ -33,6 +33,15 @@ PlayNext = (artist, title, success) ->
                 t = __playerTracklist[0]
             PlayTrack(t.artist, t.title, t.cover_url_medium, t.cover_url_large)
 
+PlayPrev = (artist, title, success) ->
+    $.each __playerTracklist, (i, track) ->
+        if track.artist == artist and track.title == title
+            if i < __playerTracklist.length - 1
+                t = __playerTracklist[i-1]
+            else
+                t = __playerTracklist[0]
+            PlayTrack(t.artist, t.title, t.cover_url_medium, t.cover_url_large)
+
 
 PlayTrack = (artist, title, cover_url_medium, cover_url_large) ->
 
@@ -108,10 +117,12 @@ $(document).keydown (e) ->
 $('#player-container #info #track-info #action i').click ->
     if $(@).hasClass('play')
         videojs('video_player').play()
-    else
+    else if $(@).hasClass('pause')
         videojs('video_player').pause()
-
-
+    else if $(@).hasClass('next')
+        PlayNext(__currentTrack.artist, __currentTrack.title)
+    else if $(@).hasClass('prev')
+        PlayPrev(__currentTrack.artist, __currentTrack.title)
 
 videojs('video_player').ready ->
     @.on 'loadedmetadata', ->
