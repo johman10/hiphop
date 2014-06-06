@@ -33,6 +33,15 @@ PlayNext = (artist, title, success) ->
                 t = __playerTracklist[0]
             PlayTrack(t.artist, t.title, t.cover_url_medium, t.cover_url_large)
 
+PlayPrev = (artist, title, success) ->
+    $.each __playerTracklist, (i, track) ->
+        if track.artist == artist and track.title == title
+            if i > 0
+                t = __playerTracklist[i-1]
+            else
+                t = __playerTracklist[__playerTracklist.length - 1]
+            PlayTrack(t.artist, t.title, t.cover_url_medium, t.cover_url_large)
+
 
 PlayTrack = (artist, title, cover_url_medium, cover_url_large) ->
 
@@ -72,7 +81,12 @@ PlayTrack = (artist, title, cover_url_medium, cover_url_large) ->
         url: 'http://gdata.youtube.com/feeds/api/videos?alt=json&max-results=1&q=' + encodeURIComponent(artist + ' - ' + title)
         json: true
     , (error, response, data) ->
-        if not data.feed.entry # no results
+        if not data
+            $('#no-connection-container').show()
+
+            $('#no-connection-container').dblclick ->
+                $('#no-connection-container').hide()
+        else if not data.feed.entry # no results
             PlayNext(__currentTrack.artist, __currentTrack.title)
         else
             $('#player-container #info #video-info').html('► ' + data.feed.entry[0].title['$t'] + ' (' + data.feed.entry[0].author[0].name['$t'] + ')')
@@ -108,10 +122,12 @@ $(document).keydown (e) ->
 $('#player-container #info #track-info #action i').click ->
     if $(@).hasClass('play')
         videojs('video_player').play()
-    else
+    else if $(@).hasClass('pause')
         videojs('video_player').pause()
-
-
+    else if $(@).hasClass('next')
+        PlayNext(__currentTrack.artist, __currentTrack.title)
+    else if $(@).hasClass('prev')
+        PlayPrev(__currentTrack.artist, __currentTrack.title)
 
 videojs('video_player').ready ->
     @.on 'loadedmetadata', ->
