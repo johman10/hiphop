@@ -36,10 +36,10 @@ PlayNext = (artist, title, success) ->
 PlayPrev = (artist, title, success) ->
     $.each __playerTracklist, (i, track) ->
         if track.artist == artist and track.title == title
-            if i < __playerTracklist.length - 1
+            if i > 0
                 t = __playerTracklist[i-1]
             else
-                t = __playerTracklist[0]
+                t = __playerTracklist[__playerTracklist.length - 1]
             PlayTrack(t.artist, t.title, t.cover_url_medium, t.cover_url_large)
 
 
